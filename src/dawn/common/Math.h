@@ -77,8 +77,12 @@ T Align(T value, size_t alignment) {
     DAWN_ASSERT(value <= std::numeric_limits<T>::max() - (alignment - 1));
     DAWN_ASSERT(IsPowerOfTwo(alignment));
     DAWN_ASSERT(alignment != 0);
+#if __has_builtin(__builtin_align_up)
+    return __builtin_align_up(value, alignment);
+#else
     T alignmentT = static_cast<T>(alignment);
     return (value + (alignmentT - 1)) & ~(alignmentT - 1);
+#endif
 }
 
 template <typename T>
@@ -113,8 +117,12 @@ template <typename T>
 DAWN_FORCE_INLINE T* AlignPtr(T* ptr, size_t alignment) {
     DAWN_ASSERT(IsPowerOfTwo(alignment));
     DAWN_ASSERT(alignment != 0);
+#if __has_builtin(__builtin_align_up)
+    return __builtin_align_up(ptr, alignment);
+#else
     return reinterpret_cast<T*>((reinterpret_cast<size_t>(ptr) + (alignment - 1)) &
                                 ~(alignment - 1));
+#endif
 }
 
 template <typename T, partition_alloc::internal::RawPtrTraits Traits>
