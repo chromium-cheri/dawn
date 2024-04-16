@@ -108,7 +108,14 @@ class BindGroupLayoutBase : public ApiObjectBase, public CachedObject {
                        bool excludePipelineCompatibiltyToken = false) const;
     PipelineCompatibilityToken GetPipelineCompatibilityToken() const;
 
+#if defined(__CHERI_PURE_CAPABILITY__)
+    // Enforce stronger alignment of BufferBindingData to ensure the object
+    // pointers (Ref<ObjectBase>) are aligned to preserve capability
+    // provenance.
+    struct alignas(alignof(max_align_t)) BufferBindingData {
+#else // defined(__CHERI_PURE_CAPABILITY__)
     struct BufferBindingData {
+#endif // defined(__CHERI_PURE_CAPABILITY__)
         uint64_t offset;
         uint64_t size;
     };
