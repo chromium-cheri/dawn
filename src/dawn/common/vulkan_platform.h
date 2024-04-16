@@ -77,7 +77,11 @@ template <typename T>
 static constexpr size_t AlignOfInStruct = alignof(WrapperStruct<T>);
 
 static constexpr size_t kNativeVkHandleAlignment = AlignOfInStruct<VkSomeHandle>;
+#if defined(__CHERI_PURE_CAPABILITY__)
+static constexpr size_t kUintPtrAlignment = AlignOfInStruct<uintptr_t>;
+#else // defined(__CHERI_PURE_CAPABILITY__)
 static constexpr size_t kUint64Alignment = AlignOfInStruct<uint64_t>;
+#endif // defined(__CHERI_PURE_CAPABILITY__)
 
 // Simple handle types that supports "nullptr_t" as a 0 value.
 template <typename Tag, typename HandleType>
@@ -130,7 +134,7 @@ HandleType* AsVkArray(detail::VkHandle<Tag, HandleType>* handle) {
     namespace dawn::native::vulkan {                                    \
     using object = detail::VkHandle<struct VkTag##object, ::object>;    \
     static_assert(sizeof(object) == sizeof(uintptr_t));                 \
-    static_assert(alignof(object) == detail::kUint64Alignment);         \
+    static_assert(alignof(object) == detail::kUintPtrAlignment);         \
     static_assert(sizeof(object) == sizeof(::object));                  \
     static_assert(alignof(object) == detail::kNativeVkHandleAlignment); \
     }  // namespace dawn::native::vulkan
