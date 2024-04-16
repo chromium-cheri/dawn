@@ -124,6 +124,17 @@ HandleType* AsVkArray(detail::VkHandle<Tag, HandleType>* handle) {
 
 }  // namespace dawn::native::vulkan
 
+#if defined(__CHERI_PURE_CAPABILITY__)
+#define VK_DEFINE_NON_DISPATCHABLE_HANDLE(object)                       \
+    DAWN_DEFINE_NATIVE_NON_DISPATCHABLE_HANDLE(object)                  \
+    namespace dawn::native::vulkan {                                    \
+    using object = detail::VkHandle<struct VkTag##object, ::object>;    \
+    static_assert(sizeof(object) == sizeof(uintptr_t));                 \
+    static_assert(alignof(object) == detail::kUint64Alignment);         \
+    static_assert(sizeof(object) == sizeof(::object));                  \
+    static_assert(alignof(object) == detail::kNativeVkHandleAlignment); \
+    }  // namespace dawn::native::vulkan
+#else // defined(__CHERI_PURE_CAPABILITY__)
 #define VK_DEFINE_NON_DISPATCHABLE_HANDLE(object)                       \
     DAWN_DEFINE_NATIVE_NON_DISPATCHABLE_HANDLE(object)                  \
     namespace dawn::native::vulkan {                                    \
@@ -133,6 +144,7 @@ HandleType* AsVkArray(detail::VkHandle<Tag, HandleType>* handle) {
     static_assert(sizeof(object) == sizeof(::object));                  \
     static_assert(alignof(object) == detail::kNativeVkHandleAlignment); \
     }  // namespace dawn::native::vulkan
+#endif // defined(__CHERI_PURE_CAPABILITY__)
 
 // Import additional parts of Vulkan that are supported on our architecture and preemptively include
 // headers that vulkan.h includes that we have "undefs" for. Note that some of the VK_USE_PLATFORM_*
