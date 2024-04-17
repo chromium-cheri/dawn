@@ -191,7 +191,11 @@ class CommandAllocator : public NonCopyable {
   private:
     // This is used for some internal computations and can be any power of two as long as code
     // using the CommandAllocator passes the static_asserts.
+#if defined(__CHERI_PURE_CAPABILITY__)
+    static constexpr size_t kMaxSupportedAlignment = alignof(max_align_t);
+#else // defined(__CHERI_PURE_CAPABILITY__)
     static constexpr size_t kMaxSupportedAlignment = 8;
+#endif // defined(__CHERI_PURE_CAPABILITY__)
 
     // To avoid checking for overflows at every step of the computations we compute an upper
     // bound of the space that will be needed in addition to the command data.
