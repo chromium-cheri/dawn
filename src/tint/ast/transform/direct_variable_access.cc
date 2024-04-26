@@ -395,7 +395,11 @@ struct DirectVariableAccess::State {
     /// Map of semantic expression to AccessChain
     utils::Hashmap<const sem::ValueExpression*, AccessChain*, 32> access_chains;
     /// Allocator for FnInfo
+#if defined(__CHERI_PURE_CAPABILITY__)
+    utils::BlockAllocator<FnInfo, 128 * 1024> fn_info_allocator;
+#else // defined(__CHERI_PURE_CAPABILITY__)
     utils::BlockAllocator<FnInfo> fn_info_allocator;
+#endif // defined(__CHERI_PURE_CAPABILITY__)
     /// Allocator for AccessChain
     utils::BlockAllocator<AccessChain> access_chain_allocator;
     /// Helper used for hoisting expressions to lets
