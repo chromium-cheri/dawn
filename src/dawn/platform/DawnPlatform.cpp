@@ -46,7 +46,11 @@ uint64_t Platform::AddTraceEvent(char phase,
                                  int numArgs,
                                  const char** argNames,
                                  const unsigned char* argTypes,
+#if defined(__CHERI_PURE_CAPABILITY__)
+                                 const uintptr_t* argValues,
+#else   // !__CHERI_PURE_CAPABILITY__
                                  const uint64_t* argValues,
+#endif  // !__CHERI_PURE_CAPABILITY__
                                  unsigned char flags) {
     // AddTraceEvent cannot be called if events are disabled.
     ASSERT(false);
