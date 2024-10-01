@@ -810,6 +810,10 @@ union TraceValueUnion {
     double m_double;
     const void* m_pointer;
     const char* m_string;
+#if defined(__CHERI_PURE_CAPABILITY__)
+    intptr_t m_intptr;
+    uintptr_t m_uintptr;
+#endif   // __CHERI_PURE_CAPABILITY__
 };
 
 // Simple container for const char* that should be copied instead of retained.
@@ -825,6 +829,15 @@ class TraceStringWithCopy {
 // Define setTraceValue for each allowed type. It stores the type and
 // value in the return arguments. This allows this API to avoid declaring any
 // structures so that it is portable to third_party libraries.
+#if defined(__CHERI_PURE_CAPABILITY__)
+#define INTERNAL_DECLARE_SET_TRACE_VALUE(actual_type, union_member, value_type_id)             \
+    static inline void setTraceValue(actual_type arg, unsigned char* type, uintptr_t* value) { \
+        TraceValueUnion typeValue;                                                             \
+        typeValue.union_member = arg;                                                          \
+        *type = value_type_id;                                                                 \
+        *value = typeValue.m_uintptr;                                                             \
+    }
+#else   // !__CHERI_PURE_CAPABILITY__
 #define INTERNAL_DECLARE_SET_TRACE_VALUE(actual_type, union_member, value_type_id)            \
     static inline void setTraceValue(actual_type arg, unsigned char* type, uint64_t* value) { \
         TraceValueUnion typeValue;                                                            \
@@ -832,12 +845,21 @@ class TraceStringWithCopy {
         *type = value_type_id;                                                                \
         *value = typeValue.m_uint;                                                            \
     }
+#endif  // !__CHERI_PURE_CAPABILITY__
 // Simpler form for int types that can be safely casted.
+#if defined(__CHERI_PURE_CAPABILITY__)
+#define INTERNAL_DECLARE_SET_TRACE_VALUE_INT(actual_type, value_type_id)                      \
+    static inline void setTraceValue(actual_type arg, unsigned char* type, uintptr_t* value) { \
+        *type = value_type_id;                                                                \
+        *value = static_cast<uint64_t>(arg);                                                  \
+    }
+#else   // !__CHERI_PURE_CAPABILITY__
 #define INTERNAL_DECLARE_SET_TRACE_VALUE_INT(actual_type, value_type_id)                      \
     static inline void setTraceValue(actual_type arg, unsigned char* type, uint64_t* value) { \
         *type = value_type_id;                                                                \
         *value = static_cast<uint64_t>(arg);                                                  \
     }
+#endif  // !__CHERI_PURE_CAPABILITY__
 
 INTERNAL_DECLARE_SET_TRACE_VALUE_INT(uint64_t, TRACE_VALUE_TYPE_UINT)
 INTERNAL_DECLARE_SET_TRACE_VALUE_INT(uint32_t, TRACE_VALUE_TYPE_UINT)
@@ -893,7 +915,11 @@ static inline dawn::platform::tracing::TraceEventHandle addTraceEvent(
     const ARG1_TYPE& arg1Val) {
     const int numArgs = 1;
     unsigned char argTypes[1];
+#if defined(__CHERI_PURE_CAPABILITY__)
+    uintptr_t argValues[1];
+#else   // !__CHERI_PURE_CAPABILITY__
     uint64_t argValues[1];
+#endif  // !__CHERI_PURE_CAPABILITY__
     setTraceValue(arg1Val, &argTypes[0], &argValues[0]);
     return TRACE_EVENT_API_ADD_TRACE_EVENT(platform, phase, categoryEnabled, name, id, numArgs,
                                            &arg1Name, argTypes, argValues, flags);
@@ -915,7 +941,11 @@ static inline dawn::platform::tracing::TraceEventHandle addTraceEvent(
     const int numArgs = 2;
     const char* argNames[2] = {arg1Name, arg2Name};
     unsigned char argTypes[2];
+#if defined(__CHERI_PURE_CAPABILITY__)
+    uintptr_t argValues[2];
+#else   // !__CHERI_PURE_CAPABILITY__
     uint64_t argValues[2];
+#endif  // !__CHERI_PURE_CAPABILITY__
     setTraceValue(arg1Val, &argTypes[0], &argValues[0]);
     setTraceValue(arg2Val, &argTypes[1], &argValues[1]);
     return TRACE_EVENT_API_ADD_TRACE_EVENT(platform, phase, categoryEnabled, name, id, numArgs,
