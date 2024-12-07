@@ -322,8 +322,8 @@ TEST_F(ComputePipelineOverridableConstantsValidationTest, OutofRangeValue) {
         // Error: one ULP higher than max f32 representable value
         std::vector<wgpu::ConstantEntry> constants{
             {nullptr, "c3",
-             std::nextafter<double>(std::numeric_limits<float>::max(),
-                                    std::numeric_limits<double>::max())}};
+             std::nextafter<float, double>(std::numeric_limits<float>::max(),
+                                           std::numeric_limits<double>::max())}};
         ASSERT_DEVICE_ERROR(TestCreatePipeline(constants));
     }
     {
@@ -336,8 +336,8 @@ TEST_F(ComputePipelineOverridableConstantsValidationTest, OutofRangeValue) {
         // Error: one ULP lower than lowest f32 representable value
         std::vector<wgpu::ConstantEntry> constants{
             {nullptr, "c3",
-             std::nextafter<double>(std::numeric_limits<float>::lowest(),
-                                    std::numeric_limits<double>::lowest())}};
+             std::nextafter<float, double>(std::numeric_limits<float>::lowest(),
+                                           std::numeric_limits<double>::lowest())}};
         ASSERT_DEVICE_ERROR(TestCreatePipeline(constants));
     }
     {
@@ -372,7 +372,7 @@ TEST_F(ComputePipelineOverridableConstantsValidationTest, OutofRangeValue) {
     {
         // Error: one ULP higher than max f16 representable value
         std::vector<wgpu::ConstantEntry> constants{
-            {nullptr, "c11", std::nextafter<double>(65504.0, std::numeric_limits<double>::max())}};
+            {nullptr, "c11", std::nextafter<float, double>(65504.0, std::numeric_limits<double>::max())}};
         ASSERT_DEVICE_ERROR(TestCreatePipeline(constants));
     }
     {
@@ -384,7 +384,7 @@ TEST_F(ComputePipelineOverridableConstantsValidationTest, OutofRangeValue) {
         // Error: one ULP lower than lowest f16 representable value
         std::vector<wgpu::ConstantEntry> constants{
             {nullptr, "c11",
-             std::nextafter<double>(-65504.0, std::numeric_limits<double>::lowest())}};
+             std::nextafter<float, double>(-65504.0, std::numeric_limits<double>::lowest())}};
         ASSERT_DEVICE_ERROR(TestCreatePipeline(constants));
     }
 }
