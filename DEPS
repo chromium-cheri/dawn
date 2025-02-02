@@ -463,6 +463,7 @@ deps = {
     ],
     'condition': 'checkout_win and (dawn_node or dawn_wasm)',
     'dep_type': 'cipd',
+    'condition': 'host_os != "freebsd"',
   },
 
   # Upstream webgpu.h headers for testing purposes
@@ -539,6 +540,7 @@ deps = {
       }
     ],
     'dep_type': 'cipd',
+    'condition': 'host_os != "freebsd"',
   },
   'third_party/siso/cipd': {
     'packages': [
