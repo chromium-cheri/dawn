@@ -186,6 +186,7 @@ deps = {
       'version': Var('dawn_go_version'),
     }],
     'dep_type': 'cipd',
+    'condition': 'host_os != "freebsd"',
   },
 
   'tools/cmake': {
@@ -205,6 +206,7 @@ deps = {
       }
     ],
     'dep_type': 'cipd',
+    'condition': 'host_os != "freebsd"',
   },
 
   # Misc dependencies inherited from Tint
