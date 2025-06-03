@@ -62,6 +62,10 @@ static constexpr uint8_t kSamplersPerExternalTexture = 1u;
 static constexpr uint8_t kUniformsPerExternalTexture = 1u;
 
 // Wire buffer alignments.
+ #if defined(__CHERI_PURE_CAPABILITY__)
+static constexpr size_t kWireBufferAlignment = alignof(max_align_t);
+#else   // !__CHERI_PURE_CAPABILITY__
 static constexpr size_t kWireBufferAlignment = 8u;
+#endif  // !__CHERI_PURE_CAPABILITY__
 
 #endif  // SRC_DAWN_COMMON_CONSTANTS_H_
