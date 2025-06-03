@@ -102,7 +102,11 @@ static constexpr size_t kPLSSlotByteSize = 4;
 static constexpr uint8_t kMaxPLSSize = kMaxPLSSlots * kPLSSlotByteSize;
 
 // Wire buffer alignments.
+ #if defined(__CHERI_PURE_CAPABILITY__)
+static constexpr size_t kWireBufferAlignment = alignof(max_align_t);
+#else   // !__CHERI_PURE_CAPABILITY__
 static constexpr size_t kWireBufferAlignment = 8u;
+#endif  // !__CHERI_PURE_CAPABILITY__
 
 // Timestamp query quantization mask to perform a granularity of ~0.1ms.
 static constexpr uint32_t kTimestampQuantizationMask = 0xFFFF0000;
