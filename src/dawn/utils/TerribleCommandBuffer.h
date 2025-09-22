@@ -34,6 +34,9 @@ class TerribleCommandBuffer : public dawn::wire::CommandSerializer {
   private:
     dawn::wire::CommandHandler* mHandler = nullptr;
     size_t mOffset = 0;
+#if defined(__CHERI_PURE_CAPABILITY__)
+    alignas(max_align_t)
+#endif   // __CHERI_PURE_CAPABILITY__
     char mBuffer[1000000];
 };
 
